@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package analytics.v1;
+
+option go_package = "github.com/Loop-company/analytics-service/proto;analyticsv1";
+
+service AnalyticsService {
+  rpc SearchEvents(SearchEventsRequest) returns (SearchEventsResponse);
+  rpc GetRegistrationsReport(ReportPeriodRequest) returns (RegistrationsReportResponse);
+  rpc GetLoginReport(ReportPeriodRequest) returns (LoginReportResponse);
+  rpc GetTopUsersReport(TopUsersReportRequest) returns (TopUsersReportResponse);
+}
+
+message SearchEventsRequest {
+  string user_id = 1;
+  string event_type = 2;
+  string source_service = 3;
+  string from = 4;
+  string to = 5;
+  int32 limit = 6;
+  int32 offset = 7;
+}
+
+message AnalyticsEvent {
+  string id = 1;
+  string external_user_id = 2;
+  string event_type = 3;
+  string source_service = 4;
+  string payload_json = 5;
+  string occurred_at = 6;
+  string received_at = 7;
+}
+
+message SearchEventsResponse {
+  repeated AnalyticsEvent events = 1;
+}
+
+message ReportPeriodRequest {
+  string from = 1;
+  string to = 2;
+}
+
+message RegistrationsReportItem {
+  string day = 1;
+  int64 count = 2;
+}
+
+message RegistrationsReportResponse {
+  repeated RegistrationsReportItem items = 1;
+}
+
+message LoginReportItem {
+  string day = 1;
+  int64 success_count = 2;
+  int64 failed_count = 3;
+}
+
+message LoginReportResponse {
+  repeated LoginReportItem items = 1;
+}
+
+message TopUsersReportRequest {
+  string from = 1;
+  string to = 2;
+  int32 limit = 3;
+}
+
+message TopUserReportItem {
+  string external_user_id = 1;
+  int64 events_count = 2;
+  string last_activity_at = 3;
+}
+
+message TopUsersReportResponse {
+  repeated TopUserReportItem items = 1;
+}
