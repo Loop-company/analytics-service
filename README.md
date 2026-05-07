@@ -1,25 +1,21 @@
-# analytics-service
+# Analytics Service
 
-Микросервис аналитики для Loop. Сервис читает доменные события из Kafka, сохраняет их в PostgreSQL и отдает поиск/отчеты по gRPC для HTTP Gateway.
+gRPC service for storing domain events and returning reports to HTTP Gateway.
 
-## Архитектура
+## Architecture Role
 
-- входящие Kafka topics: `auth.events`, `user.events`
-- gRPC API: `analytics.v1.AnalyticsService`
-- база данных: PostgreSQL
-- таблицы:
-  - `analytics_users`
-  - `analytics_events` с внешним ключом на `analytics_users`
+- Consumes Kafka topics `auth.events` and `user.events`.
+- Stores normalized events in PostgreSQL.
+- Provides gRPC methods for event search and reports.
+- Does not receive HTTP traffic directly.
 
-Сервис подключается к уже существующей Docker-сети `backend-network`. Kafka, Kafka UI и прочая инфраструктура запускаются в другом репозитории.
-
-## Формат события Kafka
+## Event Envelope
 
 ```json
 {
-  "event_id": "5d21d84b-8f10-4a8e-8470-56c5f2a51fbb",
+  "event_id": "uuid",
   "user_id": "external-user-id",
-  "event_type": "UserRegistered",
+  "event_type": "user.registered",
   "source_service": "auth-service",
   "payload": {
     "email": "user@example.com"
@@ -28,25 +24,25 @@
 }
 ```
 
-Типы событий, которые используются в отчетах:
-
-- регистрации: `UserRegistered`, `user.registered`
-- успешные входы: `UserLoggedIn`, `user.logged_in`
-- неуспешные входы: `UserLoginFailed`, `user.login_failed`
-
-## gRPC методы
+## gRPC API
 
 - `SearchEvents`
 - `GetRegistrationsReport`
 - `GetLoginReport`
 - `GetTopUsersReport`
 
-## Запуск
+## Configuration
 
-Перед запуском должна существовать сеть `backend-network`, которую создает инфраструктурный репозиторий.
-
-```bash
-docker compose up --build
+```env
+GRPC_ADDR=:50053
+POSTGRES_HOST=db-analytics
+POSTGRES_INTERNAL_PORT=5432
+POSTGRES_USER=analytics
+POSTGRES_PASSWORD=analytics_password
+POSTGRES_DB=analytics
+POSTGRES_SSL_MODE=disable
+KAFKA_BROKERS=kafka:9092
+KAFKA_TOPICS=auth.events,user.events
+KAFKA_GROUP_ID=analytics-service
+MIGRATIONS_DIR=migrations
 ```
-
-Настройки лежат в `.env`. Если Kafka в Docker доступна под другим именем, измени `KAFKA_BROKERS`.

@@ -147,9 +147,12 @@ func databaseURL() string {
 	return "postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + db + "?sslmode=" + sslMode
 }
 
-func env(key) string {
+func env(key string, fallback ...string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
+	}
+	if len(fallback) > 0 {
+		return fallback[0]
 	}
 	return ""
 }
