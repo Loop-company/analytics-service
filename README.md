@@ -37,7 +37,7 @@ Analytics Service:
 }
 ```
 
-Текущие источники:
+Источники:
 
 - `auth.events`: события Auth Service, например `user.logged_in`;
 - `user.events`: события Auth/User Service, например `user.registered`, `user.profile_updated`, `user.settings_updated`.
@@ -46,7 +46,7 @@ Kafka consumer group по умолчанию: `analytics-service`.
 
 ## gRPC API
 
-Сервис описан в `proto/analytics.proto`.
+Контракт описан в `proto/analytics.proto`.
 
 - `SearchEvents(user_id, event_type, source_service, from, to, limit, offset)` - поиск сохраненных событий.
 - `GetRegistrationsReport(from, to)` - отчет по регистрациям за период.
@@ -79,34 +79,16 @@ SHUTDOWN_TIMEOUT_SECONDS=15
 
 ## Запуск
 
-Рекомендуемый способ для всего проекта:
+Для запуска Analytics Service через Docker Compose из корня репозитория:
 
-```powershell
-cd C:\Users\kira4\Loop-company\http_gateway
+```bash
 docker compose up --build
 ```
 
-Так поднимаются gateway, auth, user, analytics, PostgreSQL, Redis, Kafka и topics.
+Этот compose поднимает Analytics Service и PostgreSQL. Для полноценной обработки событий Kafka должна быть доступна по адресу из `KAFKA_BROKERS`.
 
-Локальный запуск только Analytics Service:
+Для запуска всего backend-стека используется Docker Compose в репозитории HTTP Gateway:
 
-```powershell
-cd C:\Users\kira4\Loop-company\analytics-service
-go run ./cmd
-```
-
-Перед локальным запуском должны быть доступны PostgreSQL и Kafka. Для service-only Docker Compose:
-
-```powershell
-cd C:\Users\kira4\Loop-company\analytics-service
+```bash
 docker compose up --build
-```
-
-Этот compose поднимает analytics и PostgreSQL. Kafka должна быть доступна отдельно по `KAFKA_BROKERS`, если нужно проверить ingestion.
-
-## Проверки
-
-```powershell
-cd C:\Users\kira4\Loop-company\analytics-service
-go test ./...
 ```
