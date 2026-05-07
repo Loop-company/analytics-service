@@ -42,8 +42,6 @@ Analytics Service:
 - `auth.events`: события Auth Service, например `user.logged_in`;
 - `user.events`: события Auth/User Service, например `user.registered`, `user.profile_updated`, `user.settings_updated`.
 
-Kafka consumer group по умолчанию: `analytics-service`.
-
 ## gRPC API
 
 Контракт описан в `proto/analytics.proto`.
@@ -53,42 +51,14 @@ Kafka consumer group по умолчанию: `analytics-service`.
 - `GetLoginReport(from, to)` - отчет по логинам за период.
 - `GetTopUsersReport(from, to, limit)` - пользователи с наибольшей активностью.
 
-HTTP Gateway вызывает эти методы и возвращает результат клиенту как HTTP JSON.
-
-## Переменные окружения
-
-```env
-GRPC_ADDR=:50053
-
-POSTGRES_HOST=db-analytics
-POSTGRES_INTERNAL_PORT=5432
-POSTGRES_USER=analytics
-POSTGRES_PASSWORD=analytics_password
-POSTGRES_DB=analytics
-POSTGRES_SSL_MODE=disable
-
-KAFKA_BROKERS=kafka:9092
-KAFKA_TOPICS=auth.events,user.events
-KAFKA_GROUP_ID=analytics-service
-KAFKA_MIN_BYTES=1
-KAFKA_MAX_BYTES=10000000
-
-MIGRATIONS_DIR=migrations
-SHUTDOWN_TIMEOUT_SECONDS=15
-```
-
 ## Запуск
 
-Для запуска Analytics Service через Docker Compose из корня репозитория:
+Docker Compose для локального запуска вынесен в репозиторий `loop_infra`.
+
+Из корня `loop_infra`:
 
 ```bash
 docker compose up --build
 ```
 
-Этот compose поднимает Analytics Service и PostgreSQL. Для полноценной обработки событий Kafka должна быть доступна по адресу из `KAFKA_BROKERS`.
-
-Для запуска всего backend-стека используется Docker Compose в репозитории HTTP Gateway:
-
-```bash
-docker compose up --build
-```
+В этом репозитории остается код сервиса, `Dockerfile` и пример переменных окружения `.env.example`.
